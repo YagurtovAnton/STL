@@ -1,6 +1,7 @@
 #include<iostream>
 #include<array>
 #include<vector>
+#include<list>
 
 using std::cin;
 using std::cout;
@@ -9,12 +10,15 @@ using std::endl;
 #define tab "\t"
 #define delimetr "\n_____________________\n"
 
+template<typename T>void vector_info(const std::vector<T>& vec);
+
 //#define	STL_ARRAY
-#define	STL_VECTOR
+//#define	STL_VECTOR
+#define	STL_LIST
 
 void main()
 {
-	setlocale(LC_ALL, " ");
+	setlocale(LC_ALL, "");
 	//cout << "hello STL " << endl;
 #ifdef STL_ARRAY
 	const int N = 5;
@@ -38,25 +42,76 @@ void main()
 	vector_info(vec);
 
 	vec.shrink_to_fit();//урезает вместительность до фактического размера вектора (size)
-						//это можно сделать в целях экономии памяти, если мы уверены что в вектор
-						//больше ничего не будет добавляться
+	//это можно сделать в целях экономии памяти, если мы уверены что в вектор
+	//больше ничего не будет добавляться
 	vector_info(vec);
 	vec.resize(8);	//задает фактический размер Вектора.
-					// При уменьшении теряются значения в конце Вектора 
+	// При уменьшении теряются значения в конце Вектора 
 	for (std::vector<int>::iterator it = vec.begin(); it != vec.end(); ++it)
 	{
 		cout << *it << tab;
 	}
 	cout << endl;
 	vector_info(vec);
-	vec.resize(14);
+	//vec.resize(14);
 	for (int i : vec)cout << i << tab; cout << endl;
 	vector_info(vec);
-}
+	vec.insert(vec.begin() + 4, { 1000, 2000, 4000 });
+	for (int i : vec)cout << i << tab; cout << endl;
+
+	int index;
+	int count;
+	int value;
+	cout << "Введите индекс добавляемого элемента: "; cin >> index;
+	cout << "Введите количество добавляемых элемента: "; cin >> count;
+	cout << "Введите значение  добавляемого элемента: "; cin >> value;
+	//vec.insert(vec.begin() + index, value);
+	vec.insert(vec.begin() + index, count, value);
+	for (int i : vec)cout << i << tab; cout << endl;
+	vector_info(vec);
+	cout << "Введите индекс добавляемого элемента: "; cin >> index;
+	cout << "Введите количество добавляемого элемента: "; cin >> count;
+	vec.erase(vec.begin() + index, vec.begin() + index + count);
+	for (int i : vec)cout << i << tab; cout << endl;
 #endif // STL_VECTOR
-	template<typename T>void vector_info(const std::vector<T>&vec) 
-	{
+
+#ifdef STL_LIST
+	std::list<int>list = { 3,5,8,13,21 };
+	//for (int i = 0; i < list.size(); i++);
+	//{
+	//	cout << list[i] << tab;
+	//}
+	for (std::list<int>::iterator it = list.begin(); it != list.end();
+		cout << *it << tab;cout << endl;
+		cout << list.front() << end;
+		cout << list.back() << endl;
+		list.push_front(2);
+		list.push_back(34);
+		list.emplace_front(1);
+		for (int i : list)count <<i << tab;cout<<endl;
+
+		int index;
+		int value;
+		do
+		{
+
+	cout << "Введите индекс добавляемого элемента: "; cin >> index;
+	if (index >= list.size())cout<< "eerroor"
+		} while (list.size());
+	cout << "Введите значение  добавляемого элемента: "; cin >> value;
+	std::list<int>::iterator position = list.begin();
+	//for (int i = 0; i < index; i++) position;
+	std::advance(position, index);
+	list.insert(list.begin(), value);
+	for (int i : list)cout << i << tad; cout << endl;
+
+#endif // STL_LIST
+}
+
+
+template<typename T>void vector_info(const std::vector<T>& vec)
+{
 	cout << "Size:    " << vec.size() << endl;
 	cout << "Capacity:" << vec.capacity() << endl;
 	cout << "MaxSize: " << vec.max_size() << endl;
-	}
+}
