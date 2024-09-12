@@ -81,29 +81,29 @@ void main()
 	//{
 	//	cout << list[i] << tab;
 	//}
-	for (std::list<int>::iterator it = list.begin(); it != list.end();
-		cout << *it << tab;cout << endl;
-		cout << list.front() << end;
-		cout << list.back() << endl;
-		list.push_front(2);
-		list.push_back(34);
-		list.emplace_front(1);
-		for (int i : list)count <<i << tab;cout<<endl;
+	for (std::list<int>::iterator it = list.begin(); it != list.end(); ++it)
+		cout << *it << tab;
+	cout << endl;
+	cout << list.front() << endl;
+	cout << list.back() << endl;
+	list.push_front(2);
+	list.push_back(34);
+	list.emplace_front(1);
+	for (int i : list)cout << i << tab; cout << endl;
 
-		int index;
-		int value;
-		do
-		{
-
-	cout << "Введите индекс добавляемого элемента: "; cin >> index;
-	if (index >= list.size())cout<< "eerroor"
-		} while (list.size());
-	cout << "Введите значение  добавляемого элемента: "; cin >> value;
+	int index;
+	int value;
+	do
+	{
+		cout << "Введите индекс добавляемого элемента: "; cin >> index;
+		if (index >= list.size())cout << "Error: Out of range" << endl;
+	} while (index >= list.size());
+	cout << "Введите значение добавляемого элемента: "; cin >> value;
 	std::list<int>::iterator position = list.begin();
-	//for (int i = 0; i < index; i++) position;
+	//for (int i = 0; i < index; i++)position++;
 	std::advance(position, index);
-	list.insert(list.begin(), value);
-	for (int i : list)cout << i << tad; cout << endl;
+	list.insert(position, value);
+	for (int i : list)cout << i << tab; cout << endl;
 
 #endif // STL_LIST
 }
