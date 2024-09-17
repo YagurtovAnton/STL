@@ -1,4 +1,5 @@
 #include<iostream>
+#include<fstream>
 #include<string>
 #include<conio.h>
 #include<map>
@@ -103,11 +104,13 @@ public:
 		return os << obj.get_time()<<":\t " << obj.get_place() << " - "<< obj.get_violation();
 	}
 
+	
 void main()
 {
 	setlocale(LC_ALL, "");
 	Crime crime(1, "ул. Ленина", "11:00 1.11.2011");
 	cout << crime << endl;
+
 
 	std::map<std::string, std::list<Crime>>base =
 	{
