@@ -1,4 +1,5 @@
 #define _CRT_SECURE_NO_WARNINGS
+#pragma warning (disable: 4326)
 #include<iostream>
 #include<fstream>
 #include<string>
@@ -47,22 +48,33 @@ public:
 	//{
 	//	return license_plate;
 	//}
+
 	int get_violation_id()const
 	{
 		return id;
 	}
-
-	const std::string& get_violation()const
+	const  std::string& get_violation()const
 	{
 		return VIOLATIONS.at(id);
 	}
 	const std::string get_time()const
 	{
-		return asctime(&time);
+		/*std::string result = asctime(&time);
+		result.pop_back();
+		return result;*/
+		const int SIZE = 256;
+		char formatted[SIZE]{};
+		strftime(formatted, SIZE, "%R %e.%m.%Y", &time);
+		return formatted;
 	}
 	const std::string get_place()const
 	{
 		return place;
+	}
+	const time_t get_timestamp()const
+	{
+		tm copy = time;
+		return mktime(&copy);
 	}
 	//void set_license_plate(const std::string& license_plate)
 	//{
@@ -95,18 +107,22 @@ public:
 	}
 
 	//			Constructors
-	Crime( int violation_id,
-		const std::string& place, const std::string& time)
+	Crime
+	( 
+		int violation_id,
+		const std::string& place,
+		const std::string& time
+	)
 	{
 		//set_license_plate(license_plate);
 		this->time = {};
 		set_violation_id(violation_id);
 		set_place(place);
 		set_time(time);
-	}
 #ifdef DEBUG
 		cout << "Constructor:\t" << this << endl;
 #endif // DEBUG
+	}
 
 	~Crime()
 	{
@@ -117,8 +133,14 @@ public:
 };
 	std::ostream& operator<<(std::ostream& os, const Crime& obj)
 	{
-		return os << obj.get_time()<<":\t " << obj.get_place() << " - "<< obj.get_violation();
+		return os << obj.get_time()<<" : " << obj.get_place() << " - "<< obj.get_violation();
 	}
+	std::ofstream& operator<<(std::ofstream& os, const Crime& obj)
+	{
+		os << obj.get_violation_id() << " " << obj.get_timestamp() << " " << obj.get_place();
+		return os;
+	}
+
 	void print(const std::map<std::string, std::list<Crime>>& base);
 	void save(const std::map<std::string, std::list<Crime>>& base, const std::string& filename);
 
@@ -134,7 +156,8 @@ void main()
 		{"a777dd",{Crime(1,  "ул.Ленина",		"11:00 12.11.2011"), Crime(2,"пл.Cвободы",		"12:12 20.11.2011")}},
 		{"a000bb",{Crime(6,  "ул.Космнавтов",	"13:00 13.11.2011"), Crime(8,"ул.Космнавтов",	"13:12 22.11.2011")}},
 		{"a666aa",{Crime(10, "ул.Преуской",		"21:00 19.11.2011"), Crime(9,"ул.Преуской",		"23:32 23.11.2011")}}
-	}; print(base);
+	}; 
+	print(base);
 	save(base, "base.txt");
 }
 
@@ -157,17 +180,18 @@ void print(const std::map<std::string, std::list<Crime>>& base)
 void save(const std::map<std::string, std::list<Crime>>& base, const std::string& filename)
 {
 	std::ofstream fout(filename);
-	fout << delimiter << endl;
+	//fout << delimiter << endl;
 	for (std::map<std::string, std::list<Crime>>::const_iterator map_it = base.begin();
 		map_it != base.end();
 		++map_it)
 	{
-		fout << map_it->first << ":\n";
+		fout << map_it->first << ":\t";
 		for (std::list<Crime>::const_iterator it = map_it->second.begin(); it != map_it->second.end(); ++it)
 		{
-			fout << "\t" << *it << endl;
+			fout << *it << ",";
 		}
-		fout << delimiter << endl;
+		fout.seekp(-1, std::ios::cur);
+		fout << ";\n";
 	}
 	fout.close();
 	std::string command = "notepad " + filename;
