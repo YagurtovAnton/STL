@@ -1,3 +1,4 @@
+#define _CRT_SECURE_NO_WARNINGS
 #include<iostream>
 #include<fstream>
 #include<string>
@@ -36,10 +37,11 @@ const std::map<int, std::string> VIOLATIONS =
 
 class Crime
 {
+
 	//std::string license_plate;
 	int id;
 	std::string place;
-	std::string time;
+	tm time;
 public:
 	//const std::string& get_license_plate()const
 	//{
@@ -54,11 +56,11 @@ public:
 	{
 		return VIOLATIONS.at(id);
 	}
-	const std::string& get_time()const
+	const std::string get_time()const
 	{
-		return time;
+		return asctime(&time);
 	}
-	const std::string& get_place()const
+	const std::string get_place()const
 	{
 		return place;
 	}
@@ -76,7 +78,20 @@ public:
 	}
 	void set_time(const std::string& time)
 	{
-		this->time = time;
+		char* time_buffer = new char[time.size() + 1] {};
+		strcpy(time_buffer, time.c_str());
+		//this->time = time;
+		int time_elements[5]{};
+		int i = 0;
+		char delimiters[] = ":./ ";
+		for (char* pch = strtok(time_buffer, delimiters); pch; pch = strtok(NULL, delimiters))
+			time_elements[i++] = std::atoi(pch);
+		delete[] time_buffer;
+		this->time.tm_hour = time_elements[0];
+		this->time.tm_min = time_elements[1];
+		this->time.tm_mday = time_elements[2];
+		this->time.tm_mon = time_elements[3];
+		this->time.tm_year = time_elements[4]-1900;
 	}
 
 	//			Constructors
@@ -84,6 +99,7 @@ public:
 		const std::string& place, const std::string& time)
 	{
 		//set_license_plate(license_plate);
+		this->time = {};
 		set_violation_id(violation_id);
 		set_place(place);
 		set_time(time);
@@ -103,33 +119,57 @@ public:
 	{
 		return os << obj.get_time()<<":\t " << obj.get_place() << " - "<< obj.get_violation();
 	}
+	void print(const std::map<std::string, std::list<Crime>>& base);
+	void save(const std::map<std::string, std::list<Crime>>& base, const std::string& filename);
 
-	
 void main()
 {
 	setlocale(LC_ALL, "");
-	Crime crime(1, "ул. Ленина", "11:00 1.11.2011");
+	Crime crime(1, "ул.Ленина", "11:00 1.11.2011");
 	cout << crime << endl;
 
 
 	std::map<std::string, std::list<Crime>>base =
 	{
-		{"a777dd",{Crime(1, "ул. Ленина", "11:00 12.11.2011"),Crime(2,"пл. свободы", "12.12 20/12/2012")}},
-		{"a000bb",{Crime(6, "ул. Космнавтов", "13:00 13.11.2011"),Crime(8,"ул. Космнавтов", "13.12 22.12.2012")}},
-		{"a666aa",{Crime(10, "ул. Преуской", "21:00 19.11.2011"),Crime(9,"ул. Преуской", "23.32 23.12.2012")}}
-	};
-	for
-		(
-			std::map<std::string, std::list<Crime>>::iterator map_it = base.begin();
-			map_it != base.end();
-			++map_it
-			)
+		{"a777dd",{Crime(1,  "ул.Ленина",		"11:00 12.11.2011"), Crime(2,"пл.Cвободы",		"12:12 20.11.2011")}},
+		{"a000bb",{Crime(6,  "ул.Космнавтов",	"13:00 13.11.2011"), Crime(8,"ул.Космнавтов",	"13:12 22.11.2011")}},
+		{"a666aa",{Crime(10, "ул.Преуской",		"21:00 19.11.2011"), Crime(9,"ул.Преуской",		"23:32 23.11.2011")}}
+	}; print(base);
+	save(base, "base.txt");
+}
+
+void print(const std::map<std::string, std::list<Crime>>& base)
+{
+	cout << delimiter << endl;
+	for (std::map<std::string, std::list<Crime>>::const_iterator map_it = base.begin();
+		map_it != base.end();
+		++map_it)
 	{
 		cout << map_it->first << ":\n";
-		for(std::list<Crime>::iterator it=map_it->second.begin(); it!=map_it->second.end();++it)
+		for (std::list<Crime>::const_iterator it = map_it->second.begin(); it != map_it->second.end(); ++it)
 		{
 			cout << "\t" << *it << endl;
 		}
 		cout << delimiter << endl;
 	}
+}
+
+void save(const std::map<std::string, std::list<Crime>>& base, const std::string& filename)
+{
+	std::ofstream fout(filename);
+	fout << delimiter << endl;
+	for (std::map<std::string, std::list<Crime>>::const_iterator map_it = base.begin();
+		map_it != base.end();
+		++map_it)
+	{
+		fout << map_it->first << ":\n";
+		for (std::list<Crime>::const_iterator it = map_it->second.begin(); it != map_it->second.end(); ++it)
+		{
+			fout << "\t" << *it << endl;
+		}
+		fout << delimiter << endl;
+	}
+	fout.close();
+	std::string command = "notepad " + filename;
+	system(command.c_str());
 }
